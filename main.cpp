@@ -15,6 +15,34 @@ enum TOK{
     TOKEN_AND, TOKEN_OR, TOKEN_EOF, TOKEN_LEX_ERROR, TOKEN_INVALID, TOKEN_ERROR
 };
 
+enum State{
+    STATE__S0, STATE_APH, STATE_NUM, STATE_FLT, STATE_ANG, STATE_EXC, STATE_EQL, STATE_BRK, STATE_COL, STATE_SEM, STATE_COM,
+    STATE_MTH, STATE_SLA, STATE_CMT, STATE_NLN, STATE_BLK, STATE_STR, STATE_END, STATE_ERR
+};
+
+State table[19][15] = {
+    //                 alpha,   numbers,     point,angBracket,         =,         !,      {}(),         :,         ;,         ,,        +-,         /,         *,        \n,     other
+    /*STATE__S0*/ {STATE_APH, STATE_NUM, STATE_ERR, STATE_ANG, STATE_EQL, STATE_EXC, STATE_BRK, STATE_COL, STATE_SEM, STATE_COM, STATE_MTH, STATE_SLA, STATE_MTH, STATE_ERR, STATE_ERR},//
+    /*STATE_APH*/ {STATE_APH, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_NUM*/ {STATE_ERR, STATE_NUM, STATE_FLT, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_FLT*/ {STATE_ERR, STATE_FLT, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_ANG*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_EQL, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_EXC*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_EQL, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_EQL*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_BRK*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_COL*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_SEM*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_COM*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_MTH*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_SLA*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_CMT, STATE_BLK, STATE_ERR, STATE_ERR},//
+    /*STATE_CMT*/ {STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_CMT, STATE_NLN, STATE_ERR},//
+    /*STATE_NLN*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_BLK*/ {STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_STR, STATE_BLK, STATE_ERR},//
+    /*STATE_STR*/ {STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_BLK, STATE_END, STATE_STR, STATE_BLK, STATE_ERR},//
+    /*STATE_END*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+};
+
+
 struct TOKEN{
     TOKEN(TOK tok, string data){
         this->tok = tok;
@@ -35,31 +63,31 @@ private:
 };
 
 //takes in a file line and adds spaces before or after a bracket
-string lineSpaces(string line){
-    for(unsigned long i = 0; i < line.length() - 1; i++){
-        char currentChar = line[i];
-        char nextChar = line[i + 1];
-        if(currentChar != ' ' && (nextChar == '(' || nextChar == ')' || nextChar == '{' || nextChar == '}' || nextChar == ';')){
-            line.insert(i + 1, " ");
-        }
-    }
+//string lineSpaces(string line){
+//    for(unsigned long i = 0; i < line.length() - 1; i++){
+//        char currentChar = line[i];
+//        char nextChar = line[i + 1];
+//        if(currentChar != ' ' && (nextChar == '(' || nextChar == ')' || nextChar == '{' || nextChar == '}' || nextChar == ';')){
+//            line.insert(i + 1, " ");
+//        }
+//    }
+//
+//    return line;
+//}
 
-    return line;
-}
-
-vector<string> splitLine(string line, const string &delimiter){
-    size_t pos = 0;
-    string token;
-    vector<string> tokens;
-
-    while((pos = line.find(delimiter)) != string::npos){
-        token = line.substr(0, pos);
-        tokens.push_back(token);
-        line.erase(0, pos + delimiter.length());
-    }
-
-    return tokens;
-}
+//vector<string> splitLine(string line, const string &delimiter){
+//    size_t pos = 0;
+//    string token;
+//    vector<string> tokens;
+//
+//    while((pos = line.find(delimiter)) != string::npos){
+//        token = line.substr(0, pos);
+//        tokens.push_back(token);
+//        line.erase(0, pos + delimiter.length());
+//    }
+//
+//    return tokens;
+//}
 
 vector<TOKEN> tokeniseFile(const string &filePath){
     ifstream file;
@@ -73,21 +101,7 @@ vector<TOKEN> tokeniseFile(const string &filePath){
 
     if(file.is_open()){
         while(getline(file, line)){
-            line = lineSpaces(line);
-            line_split = splitLine(line, " ");
-            for(int i = 0; i < line_split.size(); i++){
-                temp = line_split[i];
-                if(temp == "if"){
-                    tok = new TOKEN(TOKEN_IF, "if");
-                    token_file.push_back(tok);
-                }else if(temp == "("){
-                    tok = new TOKEN(TOKEN_LEFT_BRACKET, "(");
-                    token_file.push_back(tok);
-                }else if(temp == ")"){
-                    tok = new TOKEN(TOKEN_RIGHT_BRACKET, ")");
-                    token_file.push_back(tok);
-                }
-            }
+
         }
     }
 }
@@ -95,9 +109,7 @@ vector<TOKEN> tokeniseFile(const string &filePath){
 
 
 int main() {
-    string line = "testing( 123);";
-    line = lineSpaces(line);
-    cout << line << endl;
+    State currentState = STATE__S0;
     return 0;
 }
 

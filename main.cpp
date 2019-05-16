@@ -20,10 +20,10 @@ enum State{
     STATE_MTH, STATE_SLA, STATE_CMT, STATE_NLN, STATE_BLK, STATE_STR, STATE_END, STATE_ERR
 };
 
-State table[19][15] = {
-    //                 alpha,   numbers,     point,angBracket,         =,         !,      {}(),         :,         ;,         ,,        +-,         /,         *,        \n,     other
+State table[18][15] = {
+    //             _ letters,   numbers,     point,angBracket,         =,         !,      {}(),         :,         ;,         ,,        +-,         /,         *,        \n,     other
     /*STATE__S0*/ {STATE_APH, STATE_NUM, STATE_ERR, STATE_ANG, STATE_EQL, STATE_EXC, STATE_BRK, STATE_COL, STATE_SEM, STATE_COM, STATE_MTH, STATE_SLA, STATE_MTH, STATE_ERR, STATE_ERR},//
-    /*STATE_APH*/ {STATE_APH, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
+    /*STATE_APH*/ {STATE_APH, STATE_APH, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
     /*STATE_NUM*/ {STATE_ERR, STATE_NUM, STATE_FLT, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
     /*STATE_FLT*/ {STATE_ERR, STATE_FLT, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
     /*STATE_ANG*/ {STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_EQL, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR, STATE_ERR},//
@@ -99,9 +99,51 @@ vector<TOKEN> tokeniseFile(const string &filePath){
     TOKEN* tok;
     string temp;
 
+    State currentState = STATE__S0;
+    State nextState;
+    int col = 0;
+    int counter = 0;
+    char currentChar;
     if(file.is_open()){
         while(getline(file, line)){
+            for (char i : line) {
+                currentChar = i;
+                if(isalpha(currentChar)){
+                    col = 0;
+                }else if(isdigit(currentChar)){
+                    col = 1;
+                }else if(currentChar == '.'){
+                    col = 2;
+                }else if(currentChar == '<' || currentChar == '>'){
+                    col = 3;
+                }else if(currentChar == '='){
+                    col = 4;
+                }else if(currentChar == '!'){
+                    col = 5;
+                }else if(currentChar == '{' || currentChar == '}' || currentChar == '(' || currentChar == ')'){
+                    col = 6;
+                }else if(currentChar == ':'){
+                    col = 7;
+                }else if(currentChar == ';'){
+                    col = 8;
+                }else if(currentChar == ','){
+                    col = 9;
+                }else if(currentChar == '+' || currentChar == '-'){
+                    col = 10;
+                }else if(currentChar == '/'){
+                    col = 11;
+                }else if(currentChar == '*'){
+                    col = 12;
+                }else if(currentChar == '\n'){
+                    col = 13;
+                }else{
+                    col = 14;
+                }
 
+                nextState = table[currentState][col];
+                counter++;
+                cout << counter << ": " <<  nextState << endl;
+            }
         }
     }
 }
@@ -109,7 +151,7 @@ vector<TOKEN> tokeniseFile(const string &filePath){
 
 
 int main() {
-    State currentState = STATE__S0;
+    tokeniseFile(R"(C:\Users\seanp\CLionProjects\CPS2000\Code.txt)");
     return 0;
 }
 

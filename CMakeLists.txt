@@ -3,4 +3,4 @@ project(CPS2000)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(CPS2000 main.cpp)
+add_executable(CPS2000 main.cpp lexer.cpp)

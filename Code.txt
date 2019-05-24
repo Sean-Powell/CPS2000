@@ -1,10 +1,33 @@
-fn Square(x:float) : float{
-    var y = 3.4
-    return x*x;
-    if(x <= x){
-        print(x);
-    }
-    /*
-    block comment
-    */
-} //testing comments x*x
+fn Square (x: float) : float {
+	return x*x ;
+}
+
+fn XGreaterThanY(x : float, y: float): bool {
+	var ans : bool = true;
+	if(y>x) { ans = false ; }
+	return ans;
+}
+
+fn Pow(x:float, n:int) : float
+{
+	var y: float = 1.0; // Declare y and set it to 1.0
+	if (n>0)
+	{
+		for(; n>0; n=n-1)
+		{
+			y=y*x; // Assignment y = y * x
+		}
+	}
+	else
+	{
+		for(; n< 0; n=n+1)
+		{
+			y = y / x;
+		}
+	}
+	return y; // Return y as the result
+}
+
+
+var x : float = 2.4;
+var y : int = 2 + 5;

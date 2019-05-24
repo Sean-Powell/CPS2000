@@ -126,6 +126,8 @@ TOKEN *createToken(const std::string &currentString, State state) {
                 return new TOKEN(TOKEN_FOR, currentString);
             }else if(currentString == "fn"){
                 return new TOKEN(TOKEN_FUNCTION_DECL, currentString);
+            }else if(currentString == "not") {
+                return new TOKEN(TOKEN_NOT, currentString);
             }else{
                 return new TOKEN(TOKEN_ALPHANUMERIC, currentString);
             }
@@ -192,10 +194,14 @@ TOKEN *createToken(const std::string &currentString, State state) {
 std::vector<TOKEN *> processStateChange(State newState, char currentChar) {
     std::vector<TOKEN*> tokens;
     std::vector<TOKEN*> result;
+    TOKEN* token;
 
     switch(newState){
         case STATE_ACP:
-            tokens.push_back(createToken(currentData, currentState));
+            token = createToken(currentData, currentState);
+            if(token->getTok() != TOKEN_WHITE_SPACE){
+                tokens.push_back(token);
+            }
             currentState = STATE__S0;
             currentData = "";
             result = processStateChange(getState(getColumn(currentChar), currentState), currentChar);

@@ -7,7 +7,6 @@
 
 
 #include "ASTNode.h"
-
 class ASTPrintNode : public ASTNode{
 public:
     explicit ASTPrintNode(ASTNode* toPrint) : ASTNode(){

@@ -199,7 +199,7 @@ std::vector<TOKEN *> processStateChange(State newState, char currentChar) {
     switch(newState){
         case STATE_ACP:
             token = createToken(currentData, currentState);
-            if(token->getTok() != TOKEN_WHITE_SPACE){
+            if(token->getTok() != TOKEN_WHITE_SPACE && token->getTok() != TOKEN_COMMENT){
                 tokens.push_back(token);
             }
             currentState = STATE__S0;
@@ -208,7 +208,7 @@ std::vector<TOKEN *> processStateChange(State newState, char currentChar) {
             tokens.insert(end(tokens), begin(result), end(result));
             break;
         case STATE_ERR:
-            cerr << "unknown data: " << currentData << " on line " << lineNumber << endl;
+            cerr << "unknown symbol: " << currentData << " on line " << lineNumber << endl;
             exit(-1);
         default:
             currentData += currentChar;

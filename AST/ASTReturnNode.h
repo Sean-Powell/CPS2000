@@ -6,7 +6,6 @@
 #define CPS2000_ASTRETURNNODE_H
 
 #include "ASTNode.h"
-
 class ASTReturnNode : public ASTNode{
 public:
     explicit ASTReturnNode(ASTNode* toReturn) : ASTNode(){

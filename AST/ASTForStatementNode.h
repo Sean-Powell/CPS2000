@@ -9,6 +9,7 @@
 #include "ASTNode.h"
 #include <iostream>
 
+
 class ASTForStatementNode : public ASTNode{
 public:
     ASTForStatementNode(ASTNode* init, ASTNode* cond, ASTNode* expr, ASTNode* body) : ASTNode(){
@@ -34,6 +35,7 @@ public:
     ASTNode* getBody(){
         return body;
     }
+
 
 private:
     ~ASTForStatementNode() = default;

@@ -24,6 +24,7 @@ public:
         return name;
     }
 
+
 private:
     ASTNode* assigned;
     std::string name;

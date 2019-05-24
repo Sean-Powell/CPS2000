@@ -9,7 +9,6 @@
 #include "ASTStatmentNode.h"
 #include "iostream"
 #include "vector"
-
 class ASTProgramNode : public ASTNode{
 public:
     ASTProgramNode():ASTNode(){

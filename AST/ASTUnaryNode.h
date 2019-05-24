@@ -17,7 +17,6 @@ public:
     ASTNode* getExpr(){
         return expr;
     }
-
 private:
     ASTNode* expr;
     ~ASTUnaryNode() = default;

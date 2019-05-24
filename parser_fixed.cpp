@@ -117,28 +117,31 @@ ASTFactorNode *parseFactor() {
         if (tok == TOKEN_BOOLEAN_LITERAL || tok == TOKEN_INT || tok == TOKEN_FLOAT) {
             node->setData(next->getData());
         } else {
-            if (tok == TOKEN_ALPHANUMERIC) {
-                node->setData(next->getData());
-            } else {
                 currentToken--;
                 auto parseFuncReturn = parseFunctionCall();
                 if (parseFuncReturn != nullptr) {
                     node->setASTNode(parseFuncReturn);
                 } else {
+                    currentToken = previousTokenPosition;
                     auto subExprReturn = parseSubExpression();
                     if (subExprReturn != nullptr) {
                         node->setASTNode(subExprReturn);
                     } else {
+                        currentToken = previousTokenPosition;
                         auto unaryReturn = parseUnary();
                         if (unaryReturn != nullptr) {
                             node->setASTNode(unaryReturn);
                         } else {
-                            currentToken = previousTokenPosition;
-                            return nullptr;
+                            if (tok == TOKEN_ALPHANUMERIC) {
+                                node->setData(next->getData());
+                            } else {
+                                currentToken = previousTokenPosition;
+                                return nullptr;
+                            }
                         }
                     }
                 }
-            }
+
         }
         return node;
     }
@@ -151,17 +154,18 @@ ASTTermNode *parseTerm() {
     previousTokenPosition = currentToken;
 
     auto left = parseFactor();
-    if (isTokensAvailable(1)) {
-        TOKEN *next = getNextToken();
-        if (next->getTok() == TOKEN_MULTIPLICATIVE_OP) {
-            auto right = parseFactor();
-            return new ASTTermNode(left, right, next->getData());
-        } else {
-            currentToken--;
-            return new ASTTermNode(left, nullptr, "");
+    if(left != nullptr) {
+        if (isTokensAvailable(1)) {
+            TOKEN *next = getNextToken();
+            if (next->getTok() == TOKEN_MULTIPLICATIVE_OP) {
+                auto right = parseFactor();
+                return new ASTTermNode(left, right, next->getData());
+            } else {
+                currentToken--;
+                return new ASTTermNode(left, nullptr, "");
+            }
         }
     }
-
     currentToken = previousTokenPosition;
     return nullptr;
 }
@@ -170,10 +174,11 @@ ASTSimpleExpressionNode *parseSimpleExpression() {
 
     if (isTokensAvailable(1)) {
         auto left = parseTerm();
-        TOKEN *next = getNextToken();
         if (left != nullptr) {
+            TOKEN *next = getNextToken();
             if (next->getTok() == TOKEN_ADDITIVE_OP) {
-                auto right = parseSimpleExpression();
+                //auto right = parseSimpleExpression();
+                auto right = parseTerm();
                 if (right != nullptr) {
                     return new ASTSimpleExpressionNode(left, right, next->getData());
                 }
@@ -192,7 +197,8 @@ ASTExpressionNode *parseExpression() {
     if (isTokensAvailable(1)) {
         TOKEN *next = getNextToken();
         if (isRelationalOp(next)) {
-            auto right = parseExpression();
+            auto right = parseSimpleExpression();
+            //auto right = parseExpression();
             return new ASTExpressionNode(left, right, next->getData());
         } else {
             currentToken--;
@@ -455,6 +461,7 @@ ASTStatementNode *parseStatement() {
             returned = parseAssignment();
             if (returned != nullptr) {
                 if (isTokensAvailable(1)) {
+                    next = getNextToken();
                     if (next->getTok() == TOKEN_SEMI_COLON) {
                         return new ASTStatementNode(returned);
                     }
@@ -464,6 +471,7 @@ ASTStatementNode *parseStatement() {
                 returned = parsePrint();
                 if (returned != nullptr) {
                     if (isTokensAvailable(1)) {
+                        next = getNextToken();
                         if (next->getTok() == TOKEN_SEMI_COLON) {
                             return new ASTStatementNode(returned);
                         }
@@ -507,6 +515,7 @@ ASTStatementNode *parseStatement() {
     }
 
     currentToken = previousTokenPosition;
+//    cerr << "Token " << currentToken << " was of a unexpected token sequence" << endl;
     return nullptr;
 }
 

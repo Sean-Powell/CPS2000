@@ -33,7 +33,6 @@ ASTExpressionNode* parseExpression();
 ASTStatementNode* parseStatement();
 
 TOKEN* getNextToken();
-void discardLastToken();
 bool isRelationalOp(TOKEN* t);
 ASTActualParamsNode* parseActualParams();
 ASTUnaryNode* parseUnary();

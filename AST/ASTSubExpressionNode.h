@@ -6,7 +6,6 @@
 #define CPS2000_ASTSUBEXPRESSIONNODE_H
 
 #include "ASTNode.h"
-
 class ASTSubExpressionNode : public ASTNode{
 public:
     explicit ASTSubExpressionNode(ASTNode* expr) : ASTNode(){

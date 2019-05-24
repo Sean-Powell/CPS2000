@@ -5,8 +5,9 @@
 #ifndef CPS2000_ASTFORMALPARAM_H
 #define CPS2000_ASTFORMALPARAM_H
 
-#import "ASTNode.h"
-#import <iostream>
+#include "ASTNode.h"
+#include <iostream>
+
 class ASTFormalParam : public ASTNode{
 public:
     ASTFormalParam(std::string name, std::string type) : ASTNode(){
@@ -22,6 +23,7 @@ public:
     std::string getType(){
         return type;
     }
+
 
 private:
     std::string name;
